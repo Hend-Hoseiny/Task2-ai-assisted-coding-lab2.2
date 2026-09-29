@@ -4,11 +4,16 @@ import mongoose from 'mongoose';
 
 const ratingSchema = new mongoose.Schema(
   {
-    // TODO
+    movieCode: { type: String, required: true },
+    rating: { type: Number, required: true, min: 1, max: 5 },
+    note: { type: String },
+    ratedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   },
   { timestamps: true }
 );
 
-// TODO: add the compound uniqueness constraint described in README.md section 1.
+// compound unique index to prevent the same user rating the same movie twice
+// use sparse so anonymous (no ratedBy) ratings are not included in the index
+ratingSchema.index({ movieCode: 1, ratedBy: 1 }, { unique: true, sparse: true });
 
 export const Rating = mongoose.model('Rating', ratingSchema);
